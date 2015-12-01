@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class RayMarchCamera : MonoBehaviour
 {
-    public Material SceneShaderMaterial;
-
     Material _material;
     Camera _camera;
 
@@ -12,7 +11,16 @@ public class RayMarchCamera : MonoBehaviour
     void Start()
     {
         _camera = GetComponent<Camera>();
-        _material = Instantiate(SceneShaderMaterial);
+
+        var shader = Shader.Find("Generated/SceneShader");
+        if (shader == null) {
+            Debug.LogError("Could not find generated scene shader. Must run \"Build Shader\" on the RayMarchCamera.");
+            Destroy(this);
+            return;
+        }
+
+        _material = new Material(shader);
+
         _cube = GameObject.Find("Cube");
     }
 

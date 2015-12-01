@@ -7,11 +7,6 @@ public class RayMarchCameraEditor : Editor
 {
     RayMarchCamera targ { get { return target as RayMarchCamera; } }
 
-    void OnSceneGUI()
-    {
-
-    }
-
     override public void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -30,7 +25,7 @@ public class RayMarchCameraEditor : Editor
                 lines[i] = distanceFunction;
             }
             else if (lines[i].Contains("__SHADER_TITLE")) {
-                lines[i] = "Shader \"Custom/SceneShader\" {";
+                lines[i] = "Shader \"Generated/SceneShader\" {";
             }
             else if (lines[i].Contains("__UNIFORMS")) {
                 lines[i] = "uniform float4x4 _Cube;";
@@ -38,7 +33,7 @@ public class RayMarchCameraEditor : Editor
         }
         var shaderCode = string.Join("\n", lines);
 
-        File.WriteAllText(Application.dataPath + "/SceneShader.shader", shaderCode);
+        File.WriteAllText(Application.dataPath + "/_GeneratedSceneShader.shader", shaderCode);
         AssetDatabase.Refresh();
     }
 
