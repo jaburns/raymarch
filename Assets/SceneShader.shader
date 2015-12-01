@@ -113,7 +113,7 @@ float4 runDemo(float2 fragCoord)
     const float3 cameraOrigin = _CamPos.xyz;
     const float3 cameraDir    = _CamDir.xyz;
     const float3 cameraUp     = _CamUp.xyz;
-    const float3 cameraRight  = -cross(cameraUp, cameraDir);
+    const float3 cameraRight  = cross(cameraUp, cameraDir);
     const float2 screenPos = -1 + 2 * fragCoord;
     screenPos.x *= _ScreenParams.x / _ScreenParams.y;
     screenPos *= _CamFov / 90;
