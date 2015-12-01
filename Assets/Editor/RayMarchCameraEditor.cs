@@ -18,6 +18,8 @@ public class RayMarchCameraEditor : Editor
 
     void buildShader(string distanceFunction)
     {
+        var outputFile = RayMarchCamera.SHADER_PATH_PREFIX + targ.GetInstanceID();
+
         var template = File.ReadAllText(AssetDatabase.GetAssetPath(targ.ShaderTemplate));
         var lines = template.Split('\n');
         for (int i = 0; i < lines.Length; ++i) {
@@ -25,7 +27,7 @@ public class RayMarchCameraEditor : Editor
                 lines[i] = distanceFunction;
             }
             else if (lines[i].Contains("__SHADER_TITLE")) {
-                lines[i] = "Shader \"Generated/SceneShader\" {";
+                lines[i] = "Shader \"GeneratedRMCShader/"+outputFile+"\" {";
             }
             else if (lines[i].Contains("__UNIFORMS")) {
                 lines[i] = "uniform float4x4 _Cube;";
@@ -38,7 +40,8 @@ public class RayMarchCameraEditor : Editor
             AssetDatabase.CreateFolder("Assets/Generated", "Resources");
         }
 
-        File.WriteAllText(Application.dataPath + "/Generated/Resources/_GeneratedSceneShader.shader", shaderCode);
+        File.WriteAllText(Application.dataPath + "/Generated/Resources/"+outputFile+".shader", shaderCode);
+
         AssetDatabase.Refresh();
     }
 

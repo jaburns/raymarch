@@ -2,6 +2,8 @@
 
 public class RayMarchCamera : MonoBehaviour
 {
+    public const string SHADER_PATH_PREFIX = "rmcShader_";
+
     public Shader ShaderTemplate;
 
     Material _material;
@@ -12,7 +14,7 @@ public class RayMarchCamera : MonoBehaviour
     {
         _camera = GetComponent<Camera>();
 
-        var shader = Shader.Find("Generated/SceneShader");
+        var shader = Resources.Load<Shader>(SHADER_PATH_PREFIX + GetInstanceID());
         if (shader == null) {
             Debug.LogError("Could not find generated scene shader. Must run \"Build Shader\" on the RayMarchCamera.");
             Destroy(this);
