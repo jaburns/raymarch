@@ -4,6 +4,7 @@
         _CamPos ("CamPos", Vector) = (0,0,0,0)
         _CamDir ("CamDir", Vector) = (0,0,0,0)
         _CamUp ("CamUp", Vector) = (0,0,0,0)
+        _CamFov ("CamFov", Float) = 60
     }
 
     CGINCLUDE
@@ -19,6 +20,7 @@
     uniform float4 _CamPos;
     uniform float4 _CamDir;
     uniform float4 _CamUp;
+    uniform float _CamFov;
 
 // ----------------------------------------------------------------------------
 
@@ -114,6 +116,7 @@ float4 runDemo(float2 fragCoord)
     const float3 cameraRight  = -cross(cameraUp, cameraDir);
     const float2 screenPos = -1 + 2 * fragCoord;
     screenPos.x *= _ScreenParams.x / _ScreenParams.y;
+    screenPos *= _CamFov / 90;
     const float3 rayDir = normalize(cameraRight * screenPos.x + cameraUp * screenPos.y + cameraDir);
 
     float3 pos;

@@ -4,11 +4,20 @@ public class RayMarchCamera : MonoBehaviour
 {
     public Material SceneShaderMaterial;
 
+    Camera _camera;
+
+    void Start()
+    {
+        _camera = GetComponent<Camera>();
+    }
+
     void Update()
     {
+
         SceneShaderMaterial.SetVector("_CamPos", transform.position.AsVector4());
         SceneShaderMaterial.SetVector("_CamDir", transform.forward.AsVector4());
         SceneShaderMaterial.SetVector("_CamUp",  transform.up.AsVector4());
+        SceneShaderMaterial.SetFloat("_CamFov", _camera.fieldOfView);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
