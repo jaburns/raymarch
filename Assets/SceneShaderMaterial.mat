@@ -127,6 +127,10 @@ Material:
         first:
           name: _Metallic
         second: 0
+      data:
+        first:
+          name: _CamFov
+        second: 60
     m_Colors:
       data:
         first:
@@ -143,7 +147,7 @@ Material:
       data:
         first:
           name: _CamPos
-        second: {r: 0, g: 1, b: -10, a: 0}
+        second: {r: 0, g: 0, b: 0, a: 0}
       data:
         first:
           name: _CamDir
