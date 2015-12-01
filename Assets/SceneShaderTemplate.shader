@@ -1,10 +1,6 @@
-﻿Shader "Custom/SceneShader" {
+﻿Shader "Custom/SceneShaderTemplate" { // __SHADER_TITLE
     Properties {
         _MainTex ("Base (RGB)", 2D) = "" {}
-        _CamPos ("CamPos", Vector) = (0,0,0,0)
-        _CamDir ("CamDir", Vector) = (0,0,0,0)
-        _CamUp ("CamUp", Vector) = (0,0,0,0)
-        _TanHalfFov ("TanHalfFov", Float) = 60
     }
 
 CGINCLUDE
@@ -22,16 +18,24 @@ CGINCLUDE
     uniform float4 _CamDir;
     uniform float4 _CamUp;
     uniform float _TanHalfFov;
+    uniform float4x4 _Cube; // __UNIFORMS
 
 // ----------------------------------------------------------------------------
 
-float distfunc(float3 p) {return length(p)-1;} // DISTANCE_FUNCTION
+float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
 
 // ----------------------------------------------------------------------------
 
     const int MAX_ITER = 50;
     const float MAX_DIST = 30.0;
     const float EPSILON = 0.01;
+
+    float distfunc_1(float3 pos)
+    {
+        float4 liftedPos = float4(pos,1);
+        float4 transformed = mul(_Cube, liftedPos);
+        return distfunc(transformed.xyz);
+    }
 
     bool march (float3 ro, float3 rd, out float3 pos)
     {
@@ -41,7 +45,7 @@ float distfunc(float3 p) {return length(p)-1;} // DISTANCE_FUNCTION
 
         for (int i = 0; i < MAX_ITER; i++) {
             if (dist < EPSILON || totalDist > MAX_DIST) break;
-            dist = distfunc(pos);
+            dist = distfunc_1(pos);
             totalDist += dist;
             pos += dist * rd;
         }
@@ -71,23 +75,18 @@ float distfunc(float3 p) {return length(p)-1;} // DISTANCE_FUNCTION
         float3 pos;
         bool hit = march (cameraOrigin, rayDir, pos);
 
-        float3 color = float3 (0.0);
-
         if (hit) {
             const float2 eps = float2(0.0, EPSILON);
 
             float3 normal = normalize(float3(
-                distfunc(pos + eps.yxx) - distfunc(pos - eps.yxx),
-                distfunc(pos + eps.xyx) - distfunc(pos - eps.xyx),
-                distfunc(pos + eps.xxy) - distfunc(pos - eps.xxy)));
+                distfunc_1(pos + eps.yxx) - distfunc_1(pos - eps.yxx),
+                distfunc_1(pos + eps.xyx) - distfunc_1(pos - eps.xyx),
+                distfunc_1(pos + eps.xxy) - distfunc_1(pos - eps.xxy)));
 
-            color = float3(0.5) + normal/2;
-        }
-        else {
-            color = float3(0);
+            return float4(float3(0.5) + normal/2, 1);
         }
 
-        return float4(color, 1.0);
+        return tex2D(_MainTex, i.uv);
     }
 
 ENDCG

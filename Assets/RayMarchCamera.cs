@@ -7,10 +7,13 @@ public class RayMarchCamera : MonoBehaviour
     Material _material;
     Camera _camera;
 
+    GameObject _cube;
+
     void Start()
     {
         _camera = GetComponent<Camera>();
         _material = Instantiate(SceneShaderMaterial);
+        _cube = GameObject.Find("Cube");
     }
 
     void Update()
@@ -19,6 +22,7 @@ public class RayMarchCamera : MonoBehaviour
         _material.SetVector("_CamDir", transform.forward.AsVector4());
         _material.SetVector("_CamUp",  transform.up.AsVector4());
         _material.SetFloat("_TanHalfFov", Mathf.Tan(_camera.fieldOfView * Mathf.Deg2Rad * .5f));
+        _material.SetMatrix("_Cube", Matrix4x4.Inverse(_cube.transform.localToWorldMatrix));
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

@@ -26,8 +26,14 @@ public class RayMarchCameraEditor : Editor
         var template = File.ReadAllText(Application.dataPath + "/SceneShaderTemplate.shader");
         var lines = template.Split('\n');
         for (int i = 0; i < lines.Length; ++i) {
-            if (lines[i].Contains("DISTANCE_FUNCTION")) {
+            if (lines[i].Contains("__DISTANCE_FUNCTION")) {
                 lines[i] = distanceFunction;
+            }
+            else if (lines[i].Contains("__SHADER_TITLE")) {
+                lines[i] = "Shader \"Custom/SceneShader\" {";
+            }
+            else if (lines[i].Contains("__UNIFORMS")) {
+                lines[i] = "uniform float4x4 _Cube;";
             }
         }
         var shaderCode = string.Join("\n", lines);
