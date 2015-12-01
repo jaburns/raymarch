@@ -4,7 +4,7 @@
         _CamPos ("CamPos", Vector) = (0,0,0,0)
         _CamDir ("CamDir", Vector) = (0,0,0,0)
         _CamUp ("CamUp", Vector) = (0,0,0,0)
-        _CamFov ("CamFov", Float) = 60
+        _TanHalfFov ("TanHalfFov", Float) = 60
     }
 
 CGINCLUDE
@@ -21,46 +21,16 @@ CGINCLUDE
     uniform float4 _CamPos;
     uniform float4 _CamDir;
     uniform float4 _CamUp;
-    uniform float _CamFov;
+    uniform float _TanHalfFov;
 
 // ----------------------------------------------------------------------------
+        float box(float3 p, float3 b) {
+            float3 d = abs(p) - b;
+            return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+        }
 
-        float3 rot (float3 p, float x, float y, float z) {
-            float3 a = normalize (float3 (sin(2.0+x),sin(2.0+y),sin(2.0+z)));
-            float s = sin (_Time.y);
-            float c = cos (_Time.y);
-            float oc = 1.0 - c;
-            float4x4 m = float4x4(oc*a.x*a.x + c,      oc*a.x*a.y - a.z*s,  oc*a.z*a.x + a.y*s,  0.0,
-                        oc*a.x*a.y + a.z*s,  oc*a.y*a.y + c,      oc*a.y*a.z - a.x*s,  0.0,
-                        oc*a.z*a.x - a.y*s,  oc*a.y*a.z + a.x*s,  oc*a.z*a.z + c,      0.0,
-                        0.0,                 0.0,                 0.0,                 1.0);
-            return mul(m,float4(p,0.0)).xyz;
-        }
-        float ball (float3 p, float x, float y, float z) {
-            const float BOX_SIZE = 0.7;
-            const float BOX_EDGE = 0.2;
-            return length(max(abs(rot(p-float3(x,y,z),x,y,z))-float3(BOX_SIZE),0.0))-BOX_EDGE;
-        }
-        float ballA (float3 p) {
-            return ball (p, 3.0*sin(0.8*_Time.y), 0.5, 0.0);
-        }
-        float ballB (float3 p) {
-            return ball (p, 0.5, 2.0*sin (0.2*_Time.y), 3.0*cos (1.1*_Time.y));
-        }
-        float ballC (float3 p) {
-            return ball (p, 0.1, 3.0*cos (_Time.y), 0.3);
-        }
-        float ballD (float3 p) {
-            return ball (p, 2.0*cos (0.3*_Time.y), 1.5*sin (2.0*_Time.y), -0.2);
-        }
-        float blend (float a, float b) {
-            const float k = 1.0;
-            float h = clamp (0.5+0.5*(b-a)/k, 0.0, 1.0);
-            return lerp(b,a,h) - k*h*(1.0-h);
-        }
         float distfunc (float3 p) {
-            return blend (blend (ballA (p), ballB (p)),
-                        blend (ballC (p), ballD (p)));
+            return box(p, float3(1,2,3));
         }
 
 // ----------------------------------------------------------------------------
@@ -101,7 +71,7 @@ CGINCLUDE
         const float3 cameraRight  = cross(cameraUp, cameraDir);
         const float2 screenPos = -1 + 2 * i.uv;
         screenPos.x *= _ScreenParams.x / _ScreenParams.y;
-        screenPos *= _CamFov / 90;
+        screenPos *= _TanHalfFov;
         const float3 rayDir = normalize(cameraRight * screenPos.x + cameraUp * screenPos.y + cameraDir);
 
         float3 pos;
