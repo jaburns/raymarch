@@ -1,11 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RayMarchCamera : MonoBehaviour
 {
+    public Shader ShaderTemplate;
+
     Material _material;
     Camera _camera;
-
     GameObject _cube;
 
     void Start()

@@ -18,7 +18,7 @@ public class RayMarchCameraEditor : Editor
 
     void buildShader(string distanceFunction)
     {
-        var template = File.ReadAllText(Application.dataPath + "/SceneShaderTemplate.shader");
+        var template = File.ReadAllText(AssetDatabase.GetAssetPath(targ.ShaderTemplate));
         var lines = template.Split('\n');
         for (int i = 0; i < lines.Length; ++i) {
             if (lines[i].Contains("__DISTANCE_FUNCTION")) {
@@ -33,7 +33,12 @@ public class RayMarchCameraEditor : Editor
         }
         var shaderCode = string.Join("\n", lines);
 
-        File.WriteAllText(Application.dataPath + "/_GeneratedSceneShader.shader", shaderCode);
+        if (!AssetDatabase.IsValidFolder("Assets/Generated/Resources")) {
+            AssetDatabase.CreateFolder("Assets", "Generated");
+            AssetDatabase.CreateFolder("Assets/Generated", "Resources");
+        }
+
+        File.WriteAllText(Application.dataPath + "/Generated/Resources/_GeneratedSceneShader.shader", shaderCode);
         AssetDatabase.Refresh();
     }
 

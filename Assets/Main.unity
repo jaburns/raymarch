@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885440306e02b4ae9b2e9087503eeefd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SceneShaderMaterial: {fileID: 2100000, guid: b471e780cc6704cfca65a18ff2543794, type: 2}
+  ShaderTemplate: {fileID: 4800000, guid: 01ed8f19e702442969c45083419f76ba, type: 3}
 --- !u!81 &1235586846
 AudioListener:
   m_ObjectHideFlags: 0
@@ -314,7 +314,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: .699999988, y: 1.70000005, z: .699999988}
+  m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1538003355
 Transform:

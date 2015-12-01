@@ -16,6 +16,10 @@
 
 .DS_Store
 
+# Procedurally generated assets
+/Assets/Generated/
+/Assets/Generated.meta
+
 # Unity3D generated meta files
 *.pidb.meta
 
