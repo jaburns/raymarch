@@ -11,25 +11,26 @@ CGINCLUDE
     {
         float4 pos : SV_POSITION;
         half2 uv : TEXCOORD0;
+        float4 scrPos : TEXCOORD1;
     };
 
+    uniform sampler2D_float _CameraDepthTexture;
     uniform sampler2D _MainTex;
     uniform float4 _CamPos;
     uniform float4 _CamDir;
     uniform float4 _CamUp;
     uniform float _TanHalfFov;
-    uniform float4x4 _Cube; // __UNIFORMS
+    // __UNIFORMS
 
-    float blend(float a, float b) {
+    float blend(float a, float b)
+    {
         const float k = 1;
         float h = clamp(.5+.5*(b-a)/k, 0, 1);
         return lerp(b,a,h) - k*h*(1-h);
     }
 
 // ----------------------------------------------------------------------------
-
 float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
-
 // ----------------------------------------------------------------------------
 
     const int MAX_ITER = 50;
@@ -57,6 +58,7 @@ float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
         v2f o;
         o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
         o.uv = v.texcoord.xy;
+        o.scrPos = ComputeScreenPos(o.pos);
         return o;
     }
 
@@ -75,14 +77,18 @@ float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
         bool hit = march (cameraOrigin, rayDir, pos);
 
         if (hit) {
-            const float2 eps = float2(0.0, EPSILON);
+            // 30 = Camera far plane
+            float depth = 30 * Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
+            if (depth > length(pos - cameraOrigin)) {
+                const float2 eps = float2(0.0, EPSILON);
 
-            float3 normal = normalize(float3(
-                distfunc(pos + eps.yxx) - distfunc(pos - eps.yxx),
-                distfunc(pos + eps.xyx) - distfunc(pos - eps.xyx),
-                distfunc(pos + eps.xxy) - distfunc(pos - eps.xxy)));
+                float3 normal = normalize(float3(
+                    distfunc(pos + eps.yxx) - distfunc(pos - eps.yxx),
+                    distfunc(pos + eps.xyx) - distfunc(pos - eps.xyx),
+                    distfunc(pos + eps.xxy) - distfunc(pos - eps.xxy)));
 
-            return float4(float3(0.5) + normal/2, 1);
+                return float4(float3(0.5) + normal/2, 1);
+            }
         }
 
         return tex2D(_MainTex, i.uv);

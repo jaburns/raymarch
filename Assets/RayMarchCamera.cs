@@ -13,6 +13,7 @@ public class RayMarchCamera : MonoBehaviour
     void Start()
     {
         _camera = GetComponent<Camera>();
+        _camera.depthTextureMode = DepthTextureMode.Depth;
 
         var shader = Resources.Load<Shader>(SHADER_PATH_PREFIX + GetInstanceID());
         if (shader == null) {
