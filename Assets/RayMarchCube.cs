@@ -8,12 +8,9 @@ public class RayMarchCube : RayMarchObject
     public override string GetDistanceFunction()
     {
         return string.Format(
-            "float box(float3 p, float3 b, float r) {{" +
-                "return length(max(abs(p)-b,0.0))-r;" +
-            "}}" +
-            "float distfunc (float3 p) {{" +
-                "return box(p, float3({0},{1},{2}), {3});" +
-            "}}"
+            "const float3 b = float3({0},{1},{2});" +
+            "const float r = {3};" +
+            "return length(max(abs(p)-b,0.0))-r;"
           , .5f*Size.x
           , .5f*Size.y
           , .5f*Size.z

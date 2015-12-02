@@ -8,7 +8,7 @@ public class RayMarchCamera : MonoBehaviour
 
     Material _material;
     Camera _camera;
-    GameObject _cube;
+    RayMarchObject[] _objects;
 
     void Start()
     {
@@ -22,8 +22,7 @@ public class RayMarchCamera : MonoBehaviour
         }
 
         _material = new Material(shader);
-
-        _cube = GameObject.Find("Cube");
+        _objects = FindObjectsOfType<RayMarchObject>();
     }
 
     void Update()
@@ -32,7 +31,10 @@ public class RayMarchCamera : MonoBehaviour
         _material.SetVector("_CamDir", transform.forward.AsVector4());
         _material.SetVector("_CamUp",  transform.up.AsVector4());
         _material.SetFloat("_TanHalfFov", Mathf.Tan(_camera.fieldOfView * Mathf.Deg2Rad * .5f));
-        _material.SetMatrix("_Cube", Matrix4x4.Inverse(_cube.transform.localToWorldMatrix));
+
+        foreach (var obj in _objects) {
+            _material.SetMatrix("_obj_"+obj.name, obj.GetInverseMatrix());
+        }
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

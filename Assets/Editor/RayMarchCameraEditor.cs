@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ public class RayMarchCameraEditor : Editor
                 lines[i] = "Shader \"GeneratedRMCShader/"+outputFile+"\" {";
             }
             else if (lines[i].Contains("__UNIFORMS")) {
-                lines[i] = "uniform float4x4 _Cube;";
+                lines[i] = getUniforms();
             }
         }
         var shaderCode = string.Join("\n", lines);
@@ -45,12 +46,42 @@ public class RayMarchCameraEditor : Editor
         AssetDatabase.Refresh();
     }
 
+    string getUniforms()
+    {
+        var ret = "";
+        foreach (var obj in FindObjectsOfType<RayMarchObject>()) {
+            ret += "uniform float4x4 _obj_"+obj.name+";";
+        }
+        return ret;
+    }
+
     string buildDistanceFunction()
     {
-        var func = "";
+        var nameIndex = 0;
+        var names = new List<string>();
+        var code = "";
+
         foreach (var obj in FindObjectsOfType<RayMarchObject>()) {
-            func = obj.GetDistanceFunction(); // lol
+            names.Add("df"+nameIndex);
+            code += "float dfx"+nameIndex+"(float3 p) {\n"+obj.GetDistanceFunction()+"}\n";
+            code += "float df"+nameIndex+"(float3 p) {\nreturn dfx"+nameIndex+"(mul(_obj_"+obj.name+", float4(p,1)).xyz);}\n";
+            nameIndex++;
         }
-        return func;
+
+        code += "float distfunc(float3 p) {\n";
+
+        var blendFunc = "";
+        if (names.Count == 1) {
+            blendFunc = name+"(p)";
+        } else {
+            blendFunc = "blend("+names[0]+"(p),"+names[1]+"(p))";
+            for (int i = 2; i < names.Count; ++i) {
+                blendFunc = "blend("+blendFunc+","+names[i]+"(p))";
+            }
+        }
+
+        code += "return "+blendFunc+";}";
+
+        return code;
     }
 }
