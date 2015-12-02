@@ -77,9 +77,10 @@ float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
         bool hit = march (cameraOrigin, rayDir, pos);
 
         if (hit) {
-            // 30 = Camera far plane
-            float depth = 30 * Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
-            if (depth > length(pos - cameraOrigin)) {
+            float sceneDepth = _ProjectionParams.z * Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
+            float hitDepth = dot(pos - cameraOrigin, cameraDir);
+
+            if (sceneDepth > hitDepth) {
                 const float2 eps = float2(0.0, EPSILON);
 
                 float3 normal = normalize(float3(
