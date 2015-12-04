@@ -2,7 +2,9 @@
 
 public class PlayerController : MonoBehaviour
 {
-    public float Speed;
+    public float MoveForce;
+    public float MoveFriction;
+    public float MaxSpeed;
 
     Rigidbody _rb;
     Camera _camera;
@@ -15,20 +17,22 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        var newPos = _rb.position;
-        if (Input.GetKey(KeyCode.A)) {
-            newPos -= Speed * transform.right;
+        var moveVec = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W)) moveVec += transform.forward;
+        if (Input.GetKey(KeyCode.S)) moveVec -= transform.forward;
+        if (Input.GetKey(KeyCode.D)) moveVec += transform.right;
+        if (Input.GetKey(KeyCode.A)) moveVec -= transform.right;
+
+        if (moveVec.sqrMagnitude < .5f) {
+            _rb.AddForce(MoveFriction * -_rb.velocity);
+        } else {
+            _rb.AddForce(MoveForce * moveVec.normalized);
         }
-        else if (Input.GetKey(KeyCode.D)) {
-            newPos += Speed * transform.right;
+
+        if (_rb.velocity.sqrMagnitude > MaxSpeed*MaxSpeed) {
+            _rb.velocity = _rb.velocity.normalized * MaxSpeed;
         }
-        if (Input.GetKey(KeyCode.S)) {
-            newPos -= Speed * transform.forward;
-        }
-        else if (Input.GetKey(KeyCode.W)) {
-            newPos += Speed * transform.forward;
-        }
-        _rb.MovePosition(newPos);
 
         _rb.MoveRotation(Quaternion.Euler(0, _rb.rotation.eulerAngles.y + 0.5f*Input.GetAxis("Horizontal"), 0));
         var newPitch = _camera.transform.localRotation.eulerAngles.x - 0.2f*Input.GetAxis("Vertical");
