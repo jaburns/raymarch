@@ -24,7 +24,7 @@ CGINCLUDE
 
     float blend(float a, float b)
     {
-        const float k = 1;
+        const float k = 2;
         float h = clamp(.5+.5*(b-a)/k, 0, 1);
         return lerp(b,a,h) - k*h*(1-h);
     }
