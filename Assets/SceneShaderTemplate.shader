@@ -22,6 +22,13 @@ CGINCLUDE
     uniform float _TanHalfFov;
     // __UNIFORMS
 
+    float4 alphaOver(float4 top, float4 bottom)
+    {
+        float alpha = (top.a + bottom.a*(1 - top.a));
+        float3 color = (top.rgb*top.a + bottom.rgb*bottom.a*(1 - top.a)) / alpha;
+        return float4(color.x, color.y, color.z, alpha);
+    }
+
     float blend(float a, float b)
     {
         const float k = 2;
@@ -75,6 +82,7 @@ float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
 
         float3 pos;
         bool hit = march (cameraOrigin, rayDir, pos);
+        float4 scenePixelColor = tex2D(_MainTex, i.uv);
 
         if (hit) {
             float sceneDepth = _ProjectionParams.z * Linear01Depth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.scrPos)).r);
@@ -88,11 +96,13 @@ float distfunc(float3 p) {return length(p)-1;} // __DISTANCE_FUNCTION
                     distfunc(pos + eps.xyx) - distfunc(pos - eps.xyx),
                     distfunc(pos + eps.xxy) - distfunc(pos - eps.xxy)));
 
-                return float4(float3(0.5) + normal/2, 1);
+                float3 reflected = reflect(rayDir, normal);
+                float4 rayMarchedColor = float4(float3(0.5) + reflected/2, .9);
+                return alphaOver(rayMarchedColor, scenePixelColor);
             }
         }
 
-        return tex2D(_MainTex, i.uv);
+        return scenePixelColor;
     }
 
 ENDCG
