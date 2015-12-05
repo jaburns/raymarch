@@ -1,6 +1,4 @@
 
-#### TODO
-- Take in to account angle when comparing depth texture sample
-  with ray-traced depth.
-- Take in to account near clipping plane in depth sample scaling.
+#### Ray-Marching Camera for Unity
 
+![Demo](http://i.imgur.com/sjUCukj.gif)
