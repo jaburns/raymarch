@@ -1,4 +1,4 @@
 
 #### Ray-Marching Camera for Unity
 
-![Demo](https://raw.github.com/jaburns/raymarch/master/demo.gif)
+![Demo](https://github.com/jaburns/raymarch/raw/master/demo.gif)
